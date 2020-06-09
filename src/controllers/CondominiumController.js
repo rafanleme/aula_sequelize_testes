@@ -4,9 +4,7 @@ const { v4: uuid } = require("uuid");
 
 module.exports = {
   async index(req, res) {
-    const condominium = await Condominium.findAll({
-      include: { association: "address" },
-    });
+    const condominium = await Condominium.findAll();
     res.send(condominium);
   },
 
