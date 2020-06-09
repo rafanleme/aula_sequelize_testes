@@ -1,6 +1,5 @@
 const Manager = require("../models/Manager");
 const Condominium = require("../models/Condominium");
-const CondominiumAddress = require("../models/CondominiumAddress");
 const { v4: uuid } = require("uuid");
 
 module.exports = {
@@ -36,17 +35,6 @@ module.exports = {
       if (condominium)
         return res.status(400).json({ error: "cnpj already exists" });
 
-      let condominiumAdrress = await CondominiumAddress.findOne({
-        where: { zipcode, street, number },
-      });
-
-      if (condominiumAdrress)
-        return res
-          .status(400)
-          .json({
-            error: "there is already a registered condominium at this address",
-          });
-
       condominium = await Condominium.create({
         name,
         cnpj,
@@ -57,21 +45,6 @@ module.exports = {
       await condominium.addManager(manager, {
         through: { created_manager_id, principal: true },
       });
-
-      condominiumAdrress = await CondominiumAddress.create({
-        zipcode,
-        street,
-        number,
-        neighborhood,
-        city,
-        uf,
-        condominium_id: condominium.id,
-      });
-
-      condominium = {
-        ...condominium.dataValues,
-        address: condominiumAdrress.dataValues,
-      };
 
       res.status(201).json(condominium);
     } catch (e) {
